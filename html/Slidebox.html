@@ -7,18 +7,120 @@
     <link rel="stylesheet" href="../css/reset.css">
     <link rel="stylesheet" href="../css/slidebox.css">
     <script src="../js/zepto.js"></script>
+    <script src="picture.json"></script>
     <title>picture turns</title>
 </head>
 <body>
-<div class="slidebox">
+<div class="slidebox" id="slidebox">
     <div class="screen">
-        <div class="picture" style="background-image: url(../images/1.jpg);background-size: cover;"></div>
-        <div class="picture" style="background-image: url(../images/2.jpg);background-size: cover;"></div>
-        <div class="picture" style="background-image: url(../images/3.jpg);background-size: cover;"></div>
+        <div class="position">
+
+        </div>
     </div>
     <div class="start">
-        <span></span>
+
     </div>
 </div>
+
+<script>
+    function slidebox(id) {
+        this.id = id;
+        var dom = $('#' + id);
+        var timer = null;//定时播放动画
+        var index = 1,//滑动图片索引
+                pictureLen = 0;//图片个数
+        var screenW = 0;//视角宽度
+
+
+        function animate(x) {
+            dom.find('.position')[0].style.transform = "translate3d(" + x + "px ,0px,0px)";
+            point();
+        }
+
+        //向左滑动动画
+        function animateLeft() {
+
+            if (index + 1 <= pictureLen) {
+                index += 1;
+                animate(-(index - 1 ) * screenW);
+            }
+        }
+
+        //向右滑动动画
+        function animateRight() {
+            if (index - 1 >= 1) {
+                index -= 1;
+                animate(-(index - 1) * screenW);
+            }
+        }
+
+        function point(){
+            var arr = dom.find('.start span');
+            for(var i= 0,l=arr.length;i<l;i++){
+                if(i==index-1){
+                    arr[i].classList.add('active');
+                }
+                else{
+                    arr[i].classList.remove('active');
+                }
+            }
+        }
+        function startFlash(){
+            var fun = null;
+            timer = setInterval(function(){
+                if(index==pictureLen){
+                    fun= animateRight;
+                }
+                else if(index == 1){
+                    fun= animateLeft;
+                }
+                fun();
+            },2000);
+
+        }
+        function setData(data) {
+            //html
+            var html = [];
+
+            var pageCount = pictureLen = data.length;
+            ;
+            console.log(pageCount)
+            var pointHtml = [];
+
+            for (var i = 0, l = data.length; i < l; i++) {
+                pointHtml.push('<span></span>');
+
+                html.push('<div class="picture" style="background-image: url(' + data[i].src + ');background-size: cover;">');
+                html.push('</div>');
+            }
+            //拼接html picture
+            dom.find('.position').html(html.join(''));
+            //拼接点
+
+            dom.find('.start').html(pointHtml.join(''));
+            init();
+        }
+
+        function init() {
+            screenW = dom.find('.screen').width();
+            startFlash();
+            point();
+        }
+
+        return {
+            setData: setData,
+            next: animateLeft,
+            pre: animateRight
+        }
+    }
+    var foter = new slidebox('slidebox');
+    $.ajax({
+        url: "picture.json",
+        dataType: "json",
+        success: function (data) {
+            foter.setData(data);
+        }
+    })
+</script>
 </body>
 </html>
