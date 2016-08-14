@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="../css/slidebox.css">
     <script src="../js/zepto.js"></script>
     <script src="picture.json"></script>
+    <script src="../js/touch.js"></script>
     <title>picture turns</title>
 </head>
 <body>
@@ -54,30 +55,32 @@
             }
         }
 
-        function point(){
+        function point() {
             var arr = dom.find('.start span');
-            for(var i= 0,l=arr.length;i<l;i++){
-                if(i==index-1){
+            for (var i = 0, l = arr.length; i < l; i++) {
+                if (i == index - 1) {
                     arr[i].classList.add('active');
                 }
-                else{
+                else {
                     arr[i].classList.remove('active');
                 }
             }
         }
-        function startFlash(){
-            var fun = null;
-            timer = setInterval(function(){
-                if(index==pictureLen){
-                    fun= animateRight;
+        var fun = null;
+        function startFlash() {
+
+            timer = setInterval(function () {
+                if (index == pictureLen) {
+                    fun = animateRight;
                 }
-                else if(index == 1){
-                    fun= animateLeft;
+                else if (index == 1) {
+                    fun = animateLeft;
                 }
                 fun();
-            },2000);
+            }, 2000);
 
         }
+
         function setData(data) {
             //html
             var html = [];
@@ -101,10 +104,27 @@
             init();
         }
 
+        dom.find('.screen').on('swipeLeft', function () {
+            clearInterval(timer);
+            animateLeft();
+            startFlash();
+        });
+        // swipeLeft(animateLeft);
+        dom.find('.screen').on('swipeRight', function () {
+            clearInterval(timer);
+            animateRight();
+            startFlash();
+        });
+        dom.find('.screen').tap(function () {
+
+            // debugger
+        })
         function init() {
             screenW = dom.find('.screen').width();
             startFlash();
             point();
+
+
         }
 
         return {
